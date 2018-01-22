@@ -20,13 +20,33 @@ class ButtonClick(implements=android.view.View[OnClickListener]):
 class MainApp:
     def __init__(self):
         self._activity = android.PythonActivity.setListener(self)
-        self.api = api(self._activity)
+        self.token = None
 
     def onCreate(self):
         self.vlayout = LinearLayout(self._activity)
         self.vlayout.setOrientation(LinearLayout.VERTICAL)
         self._activity.setContentView(self.vlayout)
-        self.main_view()
+        if self.token:
+            self.main_view()
+        else:
+            self.login_view()
+
+    def login_view(self):
+        self.vlayout.removeAllViews()
+
+        self.username_text = EditText(self._activity)
+        self.username_text.setHint('Username')
+        self.vlayout.addView(self.username_text)
+
+        self.password_text = EditText(self._activity)
+        self.password_text.setHint('Password')
+        self.password_text.setInputType(0x00000001 | 0x00000080)
+        self.vlayout.addView(self.password_text)
+
+        login_button = Button(self._activity)
+        login_button.setText('Login')
+        login_button.setOnClickListener(ButtonClick(self.login))
+        self.vlayout.addView(login_button)
 
     def main_view(self):
         self.vlayout.removeAllViews()
@@ -69,6 +89,9 @@ class MainApp:
         pass
 
     def create_patients(self):
+        pass
+
+    def login(self):
         pass
 
 def main():
