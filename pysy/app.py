@@ -1,6 +1,21 @@
 import android
-from android.widget import LinearLayout, TextView
+import android.view
+from android.widget import (
+    Button, EditText, LinearLayout, RelativeLayout,
+    ListView, TextView, CheckBox
+    )
+from android.view import Gravity
 from .services import api
+
+class ButtonClick(implements=android.view.View[OnClickListener]):
+    def __init__(self, callback, *args, **kwargs):
+        self.callback = callback
+        self.args = args
+        self.kwargs = kwargs
+
+    def onClick(self, view: android.view.View) -> void:
+        self.callback(*self.args, **self.kwargs)
+
 
 class MainApp:
     def __init__(self):
@@ -8,16 +23,53 @@ class MainApp:
         self.api = api(self._activity)
 
     def onCreate(self):
-        label = TextView(self._activity)
-        label.setTextSize(50)
-        label.setText('Hello World')
+        self.vlayout = LinearLayout(self._activity)
+        self.vlayout.setOrientation(LinearLayout.VERTICAL)
+        self._activity.setContentView(self.vlayout)
+        self.main_view()
 
-        vlayout = LinearLayout(self._activity)
-        vlayout.setOrientation(LinearLayout.VERTICAL)
-        vlayout.addView(label)
+    def main_view(self):
+        self.vlayout.removeAllViews()
 
-        self._activity.setContentView(vlayout)
+        create_appointments = Button(self._activity)
+        create_appointments.setText('Create appointments')
+        create_appointments.setOnClickListener(ButtonClick(self.create_appointments))
+        self.vlayout.addView(create_appointments)
 
+        create_patients = Button(self._activity)
+        create_patients.setText('Create patients')
+        create_patients.setOnClickListener(ButtonClick(self.create_patients))
+        self.vlayout.addView(create_patients)
+
+        view_appointments = Button(self._activity)
+        view_appointments.setText('View appointments')
+        view_appointments.setOnClickListener(ButtonClick(self.view_appointments))
+        self.vlayout.addView(view_appointments)
+
+        view_doctors = Button(self._activity)
+        view_doctors.setText('View doctors')
+        view_doctors.setOnClickListener(ButtonClick(self.view_doctors))
+        self.vlayout.addView(view_doctors)
+
+        view_patients = Button(self._activity)
+        view_patients.setText('View patients')
+        view_patients.setOnClickListener(ButtonClick(self.view_patients))
+        self.vlayout.addView(view_patients)
+
+    def view_appointments(self):
+        pass
+
+    def view_doctors(self):
+        pass
+
+    def view_patients(self):
+        pass
+
+    def create_appointments(self):
+        pass
+
+    def create_patients(self):
+        pass
 
 def main():
     MainApp()
