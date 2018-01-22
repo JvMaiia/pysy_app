@@ -20,6 +20,7 @@ class ButtonClick(implements=android.view.View[OnClickListener]):
 class MainApp:
     def __init__(self):
         self._activity = android.PythonActivity.setListener(self)
+        self.api = api(self._activity)
         self.token = None
 
     def onCreate(self):
@@ -47,6 +48,8 @@ class MainApp:
         login_button.setText('Login')
         login_button.setOnClickListener(ButtonClick(self.login))
         self.vlayout.addView(login_button)
+
+        self.add_error_text()
 
     def main_view(self):
         self.vlayout.removeAllViews()
@@ -92,7 +95,21 @@ class MainApp:
         pass
 
     def login(self):
-        pass
+        username = self.username_text.getText()
+        password = self.password_text.getText()
+        self.api.login(username, password, self.success_login, self.error_login)
+
+    def success_login(self, res):
+        token = str(res.get('token'))
+        self.token = token
+        self.main_view()
+
+    def error_login(self, err):
+        self.error_text.setText('something is wrong')
+
+    def add_error_text(self):
+        self.error_text = TextView(self._activity)
+        self.vlayout.addView(self.error_text)
 
 def main():
     MainApp()
