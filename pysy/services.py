@@ -32,12 +32,13 @@ class OnError(implements=com.android.volley.Response[ErrorListener]):
 class api():
     def __init__(self, activity):
         self.queue = Volley.newRequestQueue(activity)
+        self.token = None
         self.url_login = base_url + '/api-token-auth/'
         self.url_doctors = base_url + '/doctors'
         self.url_patients = base_url + '/patients'
         self.url_appointments = base_url + '/appointments'
 
-    def login(self, username, password, listener, listenerError):
+    def login(self, username, password, listener=None, listenerError=None):
         username = str(username)
         password = str(password)
 
@@ -45,7 +46,7 @@ class api():
         credentials.put('username', username)
         credentials.put('password', password)
 
-        loginrequest = toolbox.JsonObjectRequest(
+        loginRequest = toolbox.JsonObjectRequest(
             Request.Method.POST,
             self.url_login,
             credentials,
@@ -53,4 +54,19 @@ class api():
             OnError(listenerError)
         )
 
-        self.queue.add(loginrequest)
+        self.queue.add(loginRequest)
+
+    def setToken(self, token):
+        self.token = 'Token ' + token
+        self.headers = {'Authorization: ': self.token}
+
+    def getDoctors(self, listener=None, listenerError=None):
+        doctorsRequest = toolbox.StringRequest(
+            Request.Method.GET,
+            self.url_doctors,
+            OnResponse(listener),
+            OnError(listenerError),
+            self.headers
+        )
+        self.queue.add(doctorsRequest)
+

@@ -6,6 +6,7 @@ from android.widget import (
     )
 from android.view import Gravity
 from .services import api
+from .lists import *
 
 class ButtonClick(implements=android.view.View[OnClickListener]):
     def __init__(self, callback, *args, **kwargs):
@@ -21,13 +22,12 @@ class MainApp:
     def __init__(self):
         self._activity = android.PythonActivity.setListener(self)
         self.api = api(self._activity)
-        self.token = None
 
     def onCreate(self):
         self.vlayout = LinearLayout(self._activity)
         self.vlayout.setOrientation(LinearLayout.VERTICAL)
         self._activity.setContentView(self.vlayout)
-        if self.token:
+        if self.api.token:
             self.main_view()
         else:
             self.login_view()
@@ -71,7 +71,11 @@ class MainApp:
 
         view_doctors = Button(self._activity)
         view_doctors.setText('View doctors')
-        view_doctors.setOnClickListener(ButtonClick(self.view_doctors))
+        view_doctors.setOnClickListener(ButtonClick(
+            self.api.getDoctors,
+            listener = self.successGetDoctors,
+            listenerError = self.errorGetDoctors
+            ))
         self.vlayout.addView(view_doctors)
 
         view_patients = Button(self._activity)
@@ -101,15 +105,47 @@ class MainApp:
 
     def success_login(self, res):
         token = str(res.get('token'))
-        self.token = token
+        self.api.setToken(token)
+        self.main_view()
+
+    def successGetDoctors(self, res):
+        self.vlayout.removeAllViews()
+        self.add_return_button(view='main', bottom=False)
+
+        print(str(res))
+        self.doctorsItems = str(res.get('data'))
+        self.doctorsAdapter = DoctorsListAdapters(self._activity, doctors=self.DoctorsItems)
+        self.doctorsList = ListView(self._activity)
+        self.doctorsList.setAdapter(self.doctorsAdapter)
+
+        self.vlayout.addView(self.doctorsList)
+
+    def errorGetDoctors(self, err):
+        print(err)
         self.main_view()
 
     def error_login(self, err):
+        print(err)
         self.error_text.setText('something is wrong')
 
     def add_error_text(self):
         self.error_text = TextView(self._activity)
         self.vlayout.addView(self.error_text)
+
+    def add_return_button(self, view, bottom=True):
+        self.return_button = Button(self._activity)
+        self.return_button.setOnClickListener(ButtonClick(self.return_view, view))
+        self.return_button.setText('Return')
+        self.relative_rb = RelativeLayout(self._activity)
+        if bottom:
+            self.relative_rb.addView(self.return_button, _create_layout_params('bottom'))
+        else:
+            self.relative_rb.addView(self.return_button)
+        self.vlayout.addView(self.relative_rb)
+
+    def return_view(self, view):
+        if view == 'main':
+            self.main_view()
 
 def main():
     MainApp()
