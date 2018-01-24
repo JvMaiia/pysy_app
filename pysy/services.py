@@ -2,11 +2,8 @@ from com.android.volley import Request
 from com.android.volley import Response
 from com.android.volley import toolbox
 from com.android.volley.toolbox import Volley
-from org.json import (
-        JSONArray,
-        JSONException,
-        JSONObject
-    )
+from org.json import JSONObject
+from java.util import HashMap
 from .server import host, port
 
 base_url = 'http://' + str(host) + ':' + str(port) + '/api'
@@ -38,6 +35,12 @@ class api():
         self.url_patients = base_url + '/patients'
         self.url_appointments = base_url + '/appointments'
 
+    def asHashMap(self, d):
+        r = HashMap()
+        for k, v in d.items():
+            r.put(k, v)
+        return r
+
     def login(self, username, password, listener=None, listenerError=None):
         username = str(username)
         password = str(password)
@@ -58,7 +61,7 @@ class api():
 
     def setToken(self, token):
         self.token = 'Token ' + token
-        self.headers = {'Authorization: ': self.token}
+        self.headers = {'Authorization': self.token}
 
     def getDoctors(self, listener=None, listenerError=None):
         doctorsRequest = toolbox.StringRequest(
@@ -66,7 +69,7 @@ class api():
             self.url_doctors,
             OnResponse(listener),
             OnError(listenerError),
-            self.headers
+            self.asHashMap(self.headers)
         )
         self.queue.add(doctorsRequest)
 

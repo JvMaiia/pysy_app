@@ -5,6 +5,7 @@ from android.widget import (
     ListView, TextView, CheckBox
     )
 from android.view import Gravity
+from org.json import JSONArray
 from .services import api
 from .lists import *
 
@@ -16,7 +17,6 @@ class ButtonClick(implements=android.view.View[OnClickListener]):
 
     def onClick(self, view: android.view.View) -> void:
         self.callback(*self.args, **self.kwargs)
-
 
 class MainApp:
     def __init__(self):
@@ -112,9 +112,8 @@ class MainApp:
         self.vlayout.removeAllViews()
         self.add_return_button(view='main', bottom=False)
 
-        print(str(res))
-        self.doctorsItems = str(res.get('data'))
-        self.doctorsAdapter = DoctorsListAdapters(self._activity, doctors=self.DoctorsItems)
+        self.doctorsItems = JSONArray(res)
+        self.doctorsAdapter = DoctorsListAdapter(self._activity, doctors=self.doctorsItems)
         self.doctorsList = ListView(self._activity)
         self.doctorsList.setAdapter(self.doctorsAdapter)
 
