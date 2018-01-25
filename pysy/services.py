@@ -54,7 +54,8 @@ class api():
             self.url_login,
             credentials,
             OnResponse(listener),
-            OnError(listenerError)
+            OnError(listenerError),
+            HashMap()
         )
 
         self.queue.add(loginRequest)
