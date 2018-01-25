@@ -73,3 +73,12 @@ class api():
         )
         self.queue.add(doctorsRequest)
 
+    def getPatients(self, listener=None, listenerError=None):
+        patientsRequest = toolbox.StringRequest(
+            Request.Method.GET,
+            self.url_patients,
+            OnResponse(listener),
+            OnError(listenerError),
+            self.asHashMap(self.headers)
+        )
+        self.queue.add(patientsRequest)

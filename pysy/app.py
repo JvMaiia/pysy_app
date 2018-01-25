@@ -7,16 +7,10 @@ from android.widget import (
 from android.view import Gravity
 from org.json import JSONArray
 from .services import api
-from .lists import *
-
-class ButtonClick(implements=android.view.View[OnClickListener]):
-    def __init__(self, callback, *args, **kwargs):
-        self.callback = callback
-        self.args = args
-        self.kwargs = kwargs
-
-    def onClick(self, view: android.view.View) -> void:
-        self.callback(*self.args, **self.kwargs)
+from .lists import (
+    ButtonClick, _create_layout_params,
+    DoctorsListAdapter, PatientsListAdapter
+    )
 
 class MainApp:
     def __init__(self):
@@ -74,13 +68,17 @@ class MainApp:
         view_doctors.setOnClickListener(ButtonClick(
             self.api.getDoctors,
             listener = self.successGetDoctors,
-            listenerError = self.errorGetDoctors
+            listenerError = self.errorGet
             ))
         self.vlayout.addView(view_doctors)
 
         view_patients = Button(self._activity)
         view_patients.setText('View patients')
-        view_patients.setOnClickListener(ButtonClick(self.view_patients))
+        view_patients.setOnClickListener(ButtonClick(
+            self.api.getPatients,
+            listener = self.successGetPatients,
+            listenerError = self.errorGet
+            ))
         self.vlayout.addView(view_patients)
 
     def view_appointments(self):
@@ -97,7 +95,43 @@ class MainApp:
         self.vlayout.addView(self.doctorsList)
 
     def view_patients(self):
-        pass
+        self.vlayout.removeAllViews()
+        self.add_return_button(view='main', bottom=False)
+        
+        self.patientsAdapter = PatientsListAdapter(
+            self._activity,
+            self.patientsItems,
+            listener = self._dispatch_event
+            )
+        self.patientsList = ListView(self._activity)
+        self.patientsList.setAdapter(self.patientsAdapter)
+
+        self.vlayout.addView(self.patientsList)
+
+    def details_patient(self, patient):
+        self.vlayout.removeAllViews()
+
+        name_text = TextView(self._activity)
+        name_text.setText('Patient: %s' % (patient.get('complete_name')))
+        name_text.setTextSize(22)
+        self.vlayout.addView(name_text)
+
+        email_text = TextView(self._activity)
+        email_text.setText('\nEmail: %s' % (patient.get('email')))
+        email_text.setTextSize(22)
+        self.vlayout.addView(email_text)
+
+        birthdate_text = TextView(self._activity)
+        birthdate_text.setText('\nBirth date: %s' % (patient.get('birth_date')))
+        birthdate_text.setTextSize(22)
+        self.vlayout.addView(birthdate_text)
+
+        number_text = TextView(self._activity)
+        number_text.setText('\nNumber: %s' % (patient.get('number_for_contact1')))
+        number_text.setTextSize(22)
+        self.vlayout.addView(number_text)
+
+        self.add_return_button(view='view_patients')
 
     def create_appointments(self):
         pass
@@ -119,13 +153,20 @@ class MainApp:
         self.doctorsItems = JSONArray(res)
         self.view_doctors(self)
 
-    def errorGetDoctors(self, err):
+    def successGetPatients(self, res):
+        self.patientsItems = JSONArray(res)
+        self.view_patients(self)
+
+    def errorGet(self, err):
         print(err)
-        self.main_view()
 
     def error_login(self, err):
         print(err)
         self.error_text.setText('something is wrong')
+
+    def _dispatch_event(self, event=None, value=None):
+        if event == 'details_patient':
+            self.return_view('details_patient', value=value)
 
     def add_error_text(self):
         self.error_text = TextView(self._activity)
@@ -142,9 +183,13 @@ class MainApp:
             self.relative_rb.addView(self.return_button)
         self.vlayout.addView(self.relative_rb)
 
-    def return_view(self, view):
+    def return_view(self, view, value=None):
         if view == 'main':
             self.main_view()
+        elif view == 'view_patients':
+            self.view_patients()
+        elif view == 'details_patient':
+            self.details_patient(patient=value)
 
 def main():
     MainApp()
