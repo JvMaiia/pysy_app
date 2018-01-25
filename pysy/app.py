@@ -87,7 +87,14 @@ class MainApp:
         pass
 
     def view_doctors(self):
-        pass
+        self.vlayout.removeAllViews()
+        self.add_return_button(view='main', bottom=False)
+        
+        self.doctorsAdapter = DoctorsListAdapter(self._activity, self.doctorsItems)
+        self.doctorsList = ListView(self._activity)
+        self.doctorsList.setAdapter(self.doctorsAdapter)
+
+        self.vlayout.addView(self.doctorsList)
 
     def view_patients(self):
         pass
@@ -109,15 +116,8 @@ class MainApp:
         self.main_view()
 
     def successGetDoctors(self, res):
-        self.vlayout.removeAllViews()
-        self.add_return_button(view='main', bottom=False)
-
         self.doctorsItems = JSONArray(res)
-        self.doctorsAdapter = DoctorsListAdapter(self._activity, doctors=self.doctorsItems)
-        self.doctorsList = ListView(self._activity)
-        self.doctorsList.setAdapter(self.doctorsAdapter)
-
-        self.vlayout.addView(self.doctorsList)
+        self.view_doctors(self)
 
     def errorGetDoctors(self, err):
         print(err)

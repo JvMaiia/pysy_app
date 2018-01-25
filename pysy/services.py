@@ -6,7 +6,7 @@ from org.json import JSONObject
 from java.util import HashMap
 from .server import host, port
 
-base_url = 'http://' + str(host) + ':' + str(port) + '/api'
+base_url = 'https://' + str(host) + '/api'
 
 class OnResponse(implements=com.android.volley.Response[Listener]):
     def __init__(self, callback, *args, **kwargs):
