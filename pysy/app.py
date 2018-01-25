@@ -2,10 +2,10 @@ import android
 import android.view
 from android.widget import (
     Button, EditText, LinearLayout, RelativeLayout,
-    ListView, TextView, CheckBox
+    ListView, TextView, CheckBox, NumberPicker
     )
 from android.view import Gravity
-from org.json import JSONArray
+from org.json import JSONArray, JSONObject
 from .services import api
 from .lists import (
     ButtonClick, _create_layout_params,
@@ -55,12 +55,12 @@ class MainApp:
 
         create_appointments = Button(self._activity)
         create_appointments.setText('Create appointments')
-        create_appointments.setOnClickListener(ButtonClick(self.create_appointments))
+        create_appointments.setOnClickListener(ButtonClick(self.create_appointments_view))
         self.vlayout.addView(create_appointments)
 
         create_patients = Button(self._activity)
         create_patients.setText('Create patients')
-        create_patients.setOnClickListener(ButtonClick(self.create_patients))
+        create_patients.setOnClickListener(ButtonClick(self.create_patients_view))
         self.vlayout.addView(create_patients)
 
         view_appointments = Button(self._activity)
@@ -179,17 +179,72 @@ class MainApp:
 
         self.add_return_button(view='view_appointments')
 
-    def create_appointments(self):
-        pass
+    def create_appointments_view(self):
+        pass # TODO implement spinner
 
-    def create_patients(self):
-        pass
+    def create_patients_view(self):
+        self.vlayout.removeAllViews()
+
+        self.patient_name = EditText(self._activity)
+        self.patient_name.setHint('Patient name')
+        self.patient_name.setInputType(0x00000001)
+        self.vlayout.addView(self.patient_name)
+
+        self.patient_rg = EditText(self._activity)
+        self.patient_rg.setHint('Patient RG')
+        self.patient_rg.setInputType(0x00000002)
+        self.vlayout.addView(self.patient_rg)
+
+        horizontal = LinearLayout(self._activity)
+        horizontal.setOrientation(LinearLayout.HORIZONTAL)
+
+        birthdate_text = TextView(self._activity)
+        birthdate_text.setText('Patient birth date:')
+        horizontal.addView(birthdate_text)
+
+        self.birthdateD = NumberPicker(self._activity)
+        self.birthdateD.setMinValue(1)
+        self.birthdateD.setMaxValue(31)
+        horizontal.addView(self.birthdateD)
+        self.birthdateM = NumberPicker(self._activity)
+        self.birthdateM.setMinValue(1)
+        self.birthdateM.setMaxValue(12)
+        horizontal.addView(self.birthdateM)
+        self.birthdateY = NumberPicker(self._activity)
+        self.birthdateY.setMinValue(1900)
+        self.birthdateY.setMaxValue(2100)
+        horizontal.addView(self.birthdateY)
+
+        self.vlayout.addView(horizontal)
+
+        self.patient_number1 = EditText(self._activity)
+        self.patient_number1.setHint('Patient number 1')
+        self.patient_number1.setInputType(0x00000002)
+        self.vlayout.addView(self.patient_number1)
+
+        self.patient_number2 = EditText(self._activity)
+        self.patient_number2.setHint('Patient number 2')
+        self.patient_number2.setInputType(0x00000002)
+        self.vlayout.addView(self.patient_number2)
+
+        self.patient_email = EditText(self._activity)
+        self.patient_email.setHint('Patient email')
+        self.patient_email.setInputType(0x00000020)
+        self.vlayout.addView(self.patient_email)
+
+        create_button = Button(self._activity)
+        create_button.setOnClickListener(ButtonClick(self.create_patient))
+        create_button.setText('Create patient')
+        self.vlayout.addView(create_button)
+        self.add_error_text()
+        
+        self.add_return_button('main')
 
     def login(self):
         username = self.username_text.getText()
         password = self.password_text.getText()
         self.api.login(username, password, self.success_login, self.error_login)
-        self.error_text.setText('loading')
+        self.error_text.setText('loading...')
 
     def success_login(self, res):
         token = str(res.get('token'))
@@ -230,6 +285,10 @@ class MainApp:
         else:
             self.defineDoctors()
 
+    def successCreatePatient(self, res):
+        self.error_text.setText('Patient created')
+        self.main_view()
+
     def findDoctor(self, res):
         doctors = JSONArray(res)
         for i in range(doctors.length()):
@@ -240,6 +299,28 @@ class MainApp:
 
     def errorGet(self, err):
         print(err)
+
+    def errorCreate(self, err):
+        print(err)
+        self.error_text.setText('something was wrong')
+
+    def create_patient(self):
+        patient = JSONObject()
+
+        patient.put('complete_name', self.patient_name.getText())
+        patient.put('rg', self.patient_rg.getText())
+
+        birthdate = str(self.birthdateY.getValue()) + '-' + str(self.birthdateM.getValue()) + '-' + str(self.birthdateD.getValue())
+        patient.put('birth_date', birthdate)
+        patient.put('number_for_contact1', str(self.patient_number1.getText()))
+        patient.put('number_for_contact2', str(self.patient_number2.getText()))
+        patient.put('email', str(self.patient_email.getText()))
+        self.api.createPatient(
+            patient = patient,
+            listener = self.successCreatePatient,
+            listenerError = self.errorCreate
+        )
+        self.error_text.setText('processing...')
 
     def error_login(self, err):
         print(err)

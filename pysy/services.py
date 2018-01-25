@@ -93,3 +93,18 @@ class api():
             self.asHashMap(self.headers)
         )
         self.queue.add(appointmentsRequest)
+
+    def createPatient(self, listener=None, listenerError=None, patient=None):
+        headers = self.headers
+        headers['Content-Type'] = 'application/json'
+
+        patientCreateRequest = toolbox.JsonObjectRequest(
+            Request.Method.POST,
+            self.url_patients+'/',
+            patient,
+            OnResponse(listener),
+            OnError(listenerError),
+            self.asHashMap(headers)
+        )
+
+        self.queue.add(patientCreateRequest)
