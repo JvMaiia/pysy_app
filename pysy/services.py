@@ -33,7 +33,7 @@ class api():
         self.url_login = base_url + '/api-token-auth/'
         self.url_doctors = base_url + '/doctors'
         self.url_patients = base_url + '/patients'
-        self.url_appointments = base_url + '/appointments'
+        self.url_appointments = base_url + '/medicalapps'
 
     def asHashMap(self, d):
         r = HashMap()
@@ -82,3 +82,13 @@ class api():
             self.asHashMap(self.headers)
         )
         self.queue.add(patientsRequest)
+
+    def getAppointments(self, listener=None, listenerError=None):
+        appointmentsRequest = toolbox.StringRequest(
+            Request.Method.GET,
+            self.url_appointments,
+            OnResponse(listener),
+            OnError(listenerError),
+            self.asHashMap(self.headers)
+        )
+        self.queue.add(appointmentsRequest)

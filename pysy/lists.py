@@ -108,3 +108,51 @@ class PatientsListAdapter(extends=android.widget.BaseAdapter):
         patient = self.getItem(position)
         patientItem = PatientItem(self.context, patient, callback=self.listener)
         return patientItem.getView()
+
+class AppointmentItem:
+    def __init__(self, context, appointment, callback=None):
+        self.appointment = appointment
+        self.callback = callback
+        self.context = context
+        self.layout = LinearLayout(self.context)
+
+        self.text_view = TextView(self.context)
+        self.text_view.setText(self.appointment.get('patient') + ' | ' + self.appointment.get('state'))
+        self.text_view.setTextSize(22)
+        self.layout.addView(self.text_view)
+
+        self.details_button = Button(self.context)
+        self.details_button.setOnClickListener(ButtonClick(self.view_appointment))
+        self.details_button.getBackground().setColorFilter(0xff9e9e9e, PorterDuff.Mode.MULTIPLY)
+        self.details_button.setText('+')
+        relative = RelativeLayout(self.context)
+        relative.addView(self.details_button, _create_layout_params('right'))
+        self.layout.addView(relative)
+
+    def getView(self):
+        return self.layout
+
+    def view_appointment(self):
+        self.callback(event='details_appointment', value=self.appointment)
+
+class AppointmentsListAdapter(extends=android.widget.BaseAdapter):
+    def __init__(self, context, appointments, listener=None):
+        self.context = context
+        self.appointments = appointments
+        self.listener = listener
+
+    def getCount(self) -> int:
+        return self.appointments.length()
+
+    def getItem(self, position: int) -> java.lang.Object:
+        return self.appointments.get(position)
+
+    def getItemId(self, position: int) -> long:
+        return self.appointments.get(position).get('id')
+
+    def getView(self, position: int,
+                view: android.view.View,
+                container: android.view.ViewGroup) -> android.view.View:
+        appointment = self.getItem(position)
+        appointmentItem = AppointmentItem(self.context, appointment, callback=self.listener)
+        return appointmentItem.getView()
