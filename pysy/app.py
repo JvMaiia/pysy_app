@@ -1,8 +1,9 @@
 import android
 import android.view
+import com.jvmaia.pysy.R.layout
 from android.widget import (
     Button, EditText, LinearLayout, RelativeLayout,
-    ListView, TextView, CheckBox, NumberPicker
+    ListView, TextView, Spinner, NumberPicker, ArrayAdapter
     )
 from android.view import Gravity
 from org.json import JSONArray, JSONObject
@@ -21,11 +22,13 @@ class MainApp:
         self.doctorsItems = None
         self.patientsItems = None
         self.appointmentsItems = None
+        self.statesItems = None
 
     def onCreate(self):
         self.vlayout = LinearLayout(self._activity)
         self.vlayout.setOrientation(LinearLayout.VERTICAL)
         self._activity.setContentView(self.vlayout)
+        self.text_view = TextView(self._activity)
         if self.api.token:
             self.main_view()
         else:
@@ -180,7 +183,110 @@ class MainApp:
         self.add_return_button(view='view_appointments')
 
     def create_appointments_view(self):
-        pass # TODO implement spinner
+        if self.statesItems == None or self.doctorsItems == None or self.patientsItems == None:
+            return
+
+        self.vlayout.removeAllViews()
+
+
+        horizontalPatient = LinearLayout(self._activity)
+        horizontalPatient.setOrientation(LinearLayout.HORIZONTAL)
+        patient_text = TextView(self._activity)
+        horizontalPatient.addView(patient_text)
+        self.patient_spinner = Spinner(self._activity)
+        patients = []
+        for i in range(self.patientsItems.length()):
+            patients.append(self.patientsItems.get(i).get('complete_name'))
+        patientsAdapter = ArrayAdapter(self._activity, 0x01090008, patients)
+        patientsAdapter.setDropDownViewResource(0x01090009)
+        self.patient_spinner.setAdapter(patientsAdapter)
+        patient_text.setText('Patient: ')
+        horizontalPatient.addView(self.patient_spinner)
+
+        self.vlayout.addView(horizontalPatient)
+
+
+        horizontalDoctor = LinearLayout(self._activity)
+        horizontalDoctor.setOrientation(LinearLayout.HORIZONTAL)
+        doctor_text = TextView(self._activity)
+        doctor_text.setText('Doctor: ')
+        self.doctor_spinner = Spinner(self._activity)
+        doctors = []
+        for i in range(self.doctorsItems.length()):
+            doctors.append(self.doctorsItems.get(i).get('complete_name'))
+        doctorsAdapter = ArrayAdapter(self._activity, 0x01090008, doctors)
+        doctorsAdapter.setDropDownViewResource(0x01090009)
+        self.doctor_spinner.setAdapter(doctorsAdapter)
+        horizontalDoctor.addView(doctor_text)
+        horizontalDoctor.addView(self.doctor_spinner)
+
+        self.vlayout.addView(horizontalDoctor)
+
+
+        horizontalState = LinearLayout(self._activity)
+        horizontalState.setOrientation(LinearLayout.HORIZONTAL)
+        state_text = TextView(self._activity)
+        state_text.setText('State: ')
+        self.state_spinner = Spinner(self._activity)
+        states = []
+        for i in range(self.statesItems.length()):
+            states.append(self.statesItems.get(i).get('name'))
+        statesAdapter = ArrayAdapter(self._activity, 0x01090008, states)
+        statesAdapter.setDropDownViewResource(0x01090009)
+        self.state_spinner.setAdapter(statesAdapter)
+        horizontalState.addView(state_text)
+        horizontalState.addView(self.state_spinner)
+
+        self.vlayout.addView(horizontalState)
+
+
+        horizontalDate = LinearLayout(self._activity)
+        horizontalDate.setOrientation(LinearLayout.HORIZONTAL)
+        date_text = TextView(self._activity)
+        date_text.setText('Date:')
+        horizontalDate.addView(date_text)
+
+        self.appointmentDateD = NumberPicker(self._activity)
+        self.appointmentDateD.setMinValue(1)
+        self.appointmentDateD.setMaxValue(31)
+        horizontalDate.addView(self.appointmentDateD)
+        self.appointmentDateM = NumberPicker(self._activity)
+        self.appointmentDateM.setMinValue(1)
+        self.appointmentDateM.setMaxValue(12)
+        horizontalDate.addView(self.appointmentDateM)
+        self.appointmentDateY = NumberPicker(self._activity)
+        self.appointmentDateY.setMinValue(2018)
+        self.appointmentDateY.setMaxValue(2099)
+        horizontalDate.addView(self.appointmentDateY)
+
+        self.vlayout.addView(horizontalDate)
+
+
+        horizontalTime = LinearLayout(self._activity)
+        horizontalTime.setOrientation(LinearLayout.HORIZONTAL)
+        time_text = TextView(self._activity)
+        time_text.setText('Time:')
+        horizontalTime.addView(time_text)
+
+        self.appointmentTimeH = NumberPicker(self._activity)
+        self.appointmentTimeH.setMinValue(6)
+        self.appointmentTimeH.setMaxValue(19)
+        horizontalTime.addView(self.appointmentTimeH)
+        self.appointmentTimeM = NumberPicker(self._activity)
+        self.appointmentTimeM.setMinValue(1)
+        self.appointmentTimeM.setMaxValue(60)
+        horizontalTime.addView(self.appointmentTimeM)
+
+        self.vlayout.addView(horizontalTime)
+
+
+        create_button = Button(self._activity)
+        create_button.setOnClickListener(ButtonClick(self.create_appointment))
+        create_button.setText('Create appointment')
+        self.vlayout.addView(create_button)
+        self.add_error_text()
+        
+        self.add_return_button('main')
 
     def create_patients_view(self):
         self.vlayout.removeAllViews()
@@ -249,7 +355,31 @@ class MainApp:
     def success_login(self, res):
         token = str(res.get('token'))
         self.api.setToken(token)
+        self.defineEverything()
         self.main_view()
+
+    def defineEverything(self):
+        self.api.getPatients(
+            listener=self.definePatients,
+            listenerError=self.errorGet
+        )
+        self.api.getDoctors(
+            listener=self.defineDoctors,
+            listenerError=self.errorGet
+        )
+        self.api.getStates(
+            listener=self.defineStates,
+            listenerError=self.errorGet
+        )
+
+    def defineStates(self, res):
+        self.statesItems = JSONArray(res)
+
+    def defineDoctors(self, res):
+        self.doctorsItems = JSONArray(res)
+
+    def definePatients(self, res):
+        self.patientsItems = JSONArray(res)    
 
     def successGetDoctors(self, res):
         self.doctorsItems = JSONArray(res)
@@ -259,7 +389,13 @@ class MainApp:
         self.patientsItems = JSONArray(res)
         self.view_patients(self)
 
-    def defineDoctors(self, res=False):
+    def getDoctorByName(self, name):
+        for d in range(self.doctorsItems.length()):
+            doctor = self.doctorsItems.get(d)
+            if doctor.get('complete_name') == name:
+                return doctor
+
+    def setDoctors(self, res=False):
         if res:
             self.doctorsItems = JSONArray(res)
 
@@ -279,14 +415,20 @@ class MainApp:
 
         if self.doctorsItems == None:
             self.api.getDoctors(
-                listener = self.defineDoctors,
+                listener = self.setDoctors,
                 listenerError = self.errorGet
             )
         else:
-            self.defineDoctors()
+            self.setDoctors()
 
     def successCreatePatient(self, res):
+        print('Patient created')
         self.error_text.setText('Patient created')
+        self.main_view()
+
+    def successCreateAppointment(self, res):
+        print('Appointment created')
+        self.error_text.setText('Appointment created')
         self.main_view()
 
     def findDoctor(self, res):
@@ -318,6 +460,27 @@ class MainApp:
         self.api.createPatient(
             patient = patient,
             listener = self.successCreatePatient,
+            listenerError = self.errorCreate
+        )
+        self.error_text.setText('processing...')
+
+    def create_appointment(self):
+        appointment = JSONObject()
+
+        appointment.put('patient', str(self.patient_spinner.getSelectedItem()))
+
+        doctor = str(self.getDoctorByName(self.doctor_spinner.getSelectedItem()).get('id'))
+        appointment.put('doctor', doctor)
+
+        appointment.put('state', str(self.state_spinner.getSelectedItem()))
+
+        datetime = str(self.appointmentDateY.getValue()) + '-' + str(self.appointmentDateM.getValue()) + '-' + str(self.appointmentDateD.getValue())
+        datetime += 'T' + str(self.appointmentTimeH.getValue()) + ':' + str(self.appointmentTimeM.getValue()) + ':00'
+        appointment.put('date', datetime)
+
+        self.api.createAppointment(
+            appointment = appointment,
+            listener = self.successCreateAppointment,
             listenerError = self.errorCreate
         )
         self.error_text.setText('processing...')

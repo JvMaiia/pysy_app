@@ -21,7 +21,7 @@ setup(
     options={
         'app': {
             'formal_name': 'Pysy',
-            'bundle': 'com.example'
+            'bundle': 'com.jvmaiia'
         },
     }
 )

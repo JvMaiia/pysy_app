@@ -31,9 +31,10 @@ class api():
         self.queue = Volley.newRequestQueue(activity)
         self.token = None
         self.url_login = base_url + '/api-token-auth/'
-        self.url_doctors = base_url + '/doctors'
-        self.url_patients = base_url + '/patients'
-        self.url_appointments = base_url + '/medicalapps'
+        self.url_doctors = base_url + '/doctors/'
+        self.url_patients = base_url + '/patients/'
+        self.url_appointments = base_url + '/medicalapps/'
+        self.url_states = base_url + '/states/'
 
     def asHashMap(self, d):
         r = HashMap()
@@ -94,13 +95,23 @@ class api():
         )
         self.queue.add(appointmentsRequest)
 
+    def getStates(self, listener=None, listenerError=None):
+        statesRequest = toolbox.StringRequest(
+            Request.Method.GET,
+            self.url_states,
+            OnResponse(listener),
+            OnError(listenerError),
+            self.asHashMap(self.headers)
+        )
+        self.queue.add(statesRequest)
+
     def createPatient(self, listener=None, listenerError=None, patient=None):
         headers = self.headers
         headers['Content-Type'] = 'application/json'
 
         patientCreateRequest = toolbox.JsonObjectRequest(
             Request.Method.POST,
-            self.url_patients+'/',
+            self.url_patients,
             patient,
             OnResponse(listener),
             OnError(listenerError),
@@ -108,3 +119,19 @@ class api():
         )
 
         self.queue.add(patientCreateRequest)
+
+    def createAppointment(self, listener=None, listenerError=None, appointment=None):
+        headers = self.headers
+        headers['Content-Type'] = 'application/json'
+        print(appointment)
+
+        AppointmentCreateRequest = toolbox.JsonObjectRequest(
+            Request.Method.POST,
+            self.url_appointments,
+            appointment,
+            OnResponse(listener),
+            OnError(listenerError),
+            self.asHashMap(headers)
+        )
+
+        self.queue.add(AppointmentCreateRequest)
