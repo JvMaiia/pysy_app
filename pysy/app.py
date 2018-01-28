@@ -58,13 +58,18 @@ class MainApp:
 
         create_appointments = Button(self._activity)
         create_appointments.setText('Create appointments')
-        create_appointments.setOnClickListener(ButtonClick(self.create_appointments_view))
+        create_appointments.setOnClickListener(ButtonClick(self.create_appointment_view))
         self.vlayout.addView(create_appointments)
 
-        create_patients = Button(self._activity)
-        create_patients.setText('Create patients')
-        create_patients.setOnClickListener(ButtonClick(self.create_patients_view))
-        self.vlayout.addView(create_patients)
+        create_patient = Button(self._activity)
+        create_patient.setText('Create patients')
+        create_patient.setOnClickListener(ButtonClick(self.create_patient_view))
+        self.vlayout.addView(create_patient)
+
+        create_doctor = Button(self._activity)
+        create_doctor.setText('Create doctors')
+        create_doctor.setOnClickListener(ButtonClick(self.create_doctor_view))
+        self.vlayout.addView(create_doctor)
 
         view_appointments = Button(self._activity)
         view_appointments.setText('View appointments')
@@ -182,7 +187,7 @@ class MainApp:
 
         self.add_return_button(view='view_appointments')
 
-    def create_appointments_view(self):
+    def create_appointment_view(self):
         if self.statesItems == None or self.doctorsItems == None or self.patientsItems == None:
             return
 
@@ -288,7 +293,7 @@ class MainApp:
         
         self.add_return_button('main')
 
-    def create_patients_view(self):
+    def create_patient_view(self):
         self.vlayout.removeAllViews()
 
         self.patient_name = EditText(self._activity)
@@ -341,6 +346,27 @@ class MainApp:
         create_button = Button(self._activity)
         create_button.setOnClickListener(ButtonClick(self.create_patient))
         create_button.setText('Create patient')
+        self.vlayout.addView(create_button)
+        self.add_error_text()
+        
+        self.add_return_button('main')
+
+    def create_doctor_view(self):
+        self.vlayout.removeAllViews()
+
+        self.doctor_name = EditText(self._activity)
+        self.doctor_name.setHint('Doctor name')
+        self.doctor_name.setInputType(0x00000001)
+        self.vlayout.addView(self.doctor_name)
+
+        self.doctor_especialization = EditText(self._activity)
+        self.doctor_especialization.setHint('Doctor especialization')
+        self.doctor_especialization.setInputType(0x00000001)
+        self.vlayout.addView(self.doctor_especialization)
+
+        create_button = Button(self._activity)
+        create_button.setOnClickListener(ButtonClick(self.create_doctor))
+        create_button.setText('Create doctor')
         self.vlayout.addView(create_button)
         self.add_error_text()
         
@@ -431,6 +457,11 @@ class MainApp:
         self.error_text.setText('Appointment created')
         self.main_view()
 
+    def successCreateDoctor(self, res):
+        print('Doctor created')
+        self.error_text.setText('Doctor created')
+        self.main_view()
+
     def findDoctor(self, res):
         doctors = JSONArray(res)
         for i in range(doctors.length()):
@@ -484,6 +515,18 @@ class MainApp:
             listenerError = self.errorCreate
         )
         self.error_text.setText('processing...')
+
+    def create_doctor(self):
+        doctor = JSONObject()
+
+        doctor.put('complete_name', str(self.doctor_name.getText()))
+        doctor.put('especialization', str(self.doctor_especialization.getText()))
+
+        self.api.createDoctor(
+            doctor = doctor,
+            listener = self.successCreateDoctor,
+            listenerError = self.errorCreate
+        )
 
     def error_login(self, err):
         print(err)
