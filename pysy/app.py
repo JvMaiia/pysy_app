@@ -197,6 +197,8 @@ class MainApp:
         horizontalPatient = LinearLayout(self._activity)
         horizontalPatient.setOrientation(LinearLayout.HORIZONTAL)
         patient_text = TextView(self._activity)
+        patient_text.setText('Patient: ')
+        patient_text.setTextSize(18)
         horizontalPatient.addView(patient_text)
         self.patient_spinner = Spinner(self._activity)
         patients = []
@@ -205,7 +207,6 @@ class MainApp:
         patientsAdapter = ArrayAdapter(self._activity, 0x01090008, patients)
         patientsAdapter.setDropDownViewResource(0x01090009)
         self.patient_spinner.setAdapter(patientsAdapter)
-        patient_text.setText('Patient: ')
         horizontalPatient.addView(self.patient_spinner)
 
         self.vlayout.addView(horizontalPatient)
@@ -215,6 +216,7 @@ class MainApp:
         horizontalDoctor.setOrientation(LinearLayout.HORIZONTAL)
         doctor_text = TextView(self._activity)
         doctor_text.setText('Doctor: ')
+        doctor_text.setTextSize(18)
         self.doctor_spinner = Spinner(self._activity)
         doctors = []
         for i in range(self.doctorsItems.length()):
@@ -232,6 +234,7 @@ class MainApp:
         horizontalState.setOrientation(LinearLayout.HORIZONTAL)
         state_text = TextView(self._activity)
         state_text.setText('State: ')
+        state_text.setTextSize(18)
         self.state_spinner = Spinner(self._activity)
         states = []
         for i in range(self.statesItems.length()):
@@ -249,6 +252,7 @@ class MainApp:
         horizontalDate.setOrientation(LinearLayout.HORIZONTAL)
         date_text = TextView(self._activity)
         date_text.setText('Date:')
+        date_text.setTextSize(18)
         horizontalDate.addView(date_text)
 
         self.appointmentDateD = NumberPicker(self._activity)
@@ -271,6 +275,7 @@ class MainApp:
         horizontalTime.setOrientation(LinearLayout.HORIZONTAL)
         time_text = TextView(self._activity)
         time_text.setText('Time:')
+        time_text.setTextSize(18)
         horizontalTime.addView(time_text)
 
         self.appointmentTimeH = NumberPicker(self._activity)
@@ -311,6 +316,7 @@ class MainApp:
 
         birthdate_text = TextView(self._activity)
         birthdate_text.setText('Patient birth date:')
+        birthdate_text.setTextSize(20)
         horizontal.addView(birthdate_text)
 
         self.birthdateD = NumberPicker(self._activity)
