@@ -3,7 +3,8 @@ import android.view
 import com.jvmaia.pysy.R.layout
 from android.widget import (
     Button, EditText, LinearLayout, RelativeLayout,
-    ListView, TextView, Spinner, NumberPicker, ArrayAdapter
+    ListView, TextView, Spinner, NumberPicker,
+    ArrayAdapter, FrameLayout
     )
 from android.view import Gravity
 from org.json import JSONArray, JSONObject
@@ -27,6 +28,7 @@ class MainApp:
     def onCreate(self):
         self.vlayout = LinearLayout(self._activity)
         self.vlayout.setOrientation(LinearLayout.VERTICAL)
+        self.flayout = FrameLayout(self._activity)
         self._activity.setContentView(self.vlayout)
         self.text_view = TextView(self._activity)
         if self.api.token:
@@ -54,6 +56,7 @@ class MainApp:
         self.add_error_text()
 
     def main_view(self):
+        self.flayout.removeAllViews()
         self.vlayout.removeAllViews()
 
         create_appointments = Button(self._activity)
@@ -100,7 +103,7 @@ class MainApp:
 
     def view_appointments(self):
         self.vlayout.removeAllViews()
-        self.add_return_button(view='main', bottom=False)
+        self.vlayout.addView(self.flayout)
         
         self.appointmentsAdapter = AppointmentsListAdapter(
             self._activity,
@@ -110,21 +113,23 @@ class MainApp:
         self.appointmentsList = ListView(self._activity)
         self.appointmentsList.setAdapter(self.appointmentsAdapter)
 
-        self.vlayout.addView(self.appointmentsList)
+        self.flayout.addView(self.appointmentsList)
+        self.add_return_button(view='main', flayout=True)
 
     def view_doctors(self):
         self.vlayout.removeAllViews()
-        self.add_return_button(view='main', bottom=False)
+        self.vlayout.addView(self.flayout)
         
         self.doctorsAdapter = DoctorsListAdapter(self._activity, self.doctorsItems)
         self.doctorsList = ListView(self._activity)
         self.doctorsList.setAdapter(self.doctorsAdapter)
 
-        self.vlayout.addView(self.doctorsList)
+        self.flayout.addView(self.doctorsList)
+        self.add_return_button(view='main', flayout=True)
 
     def view_patients(self):
         self.vlayout.removeAllViews()
-        self.add_return_button(view='main', bottom=False)
+        self.vlayout.addView(self.flayout)
         
         self.patientsAdapter = PatientsListAdapter(
             self._activity,
@@ -134,7 +139,8 @@ class MainApp:
         self.patientsList = ListView(self._activity)
         self.patientsList.setAdapter(self.patientsAdapter)
 
-        self.vlayout.addView(self.patientsList)
+        self.flayout.addView(self.patientsList)
+        self.add_return_button(view='main', flayout=True)
 
     def details_patient(self, patient):
         self.vlayout.removeAllViews()
@@ -192,7 +198,10 @@ class MainApp:
             return
 
         self.vlayout.removeAllViews()
-
+        self.vlayout.addView(self.flayout)
+        vlayout = LinearLayout(self._activity)
+        vlayout.setOrientation(LinearLayout.VERTICAL)
+        self.flayout.addView(vlayout)
 
         horizontalPatient = LinearLayout(self._activity)
         horizontalPatient.setOrientation(LinearLayout.HORIZONTAL)
@@ -209,7 +218,7 @@ class MainApp:
         self.patient_spinner.setAdapter(patientsAdapter)
         horizontalPatient.addView(self.patient_spinner)
 
-        self.vlayout.addView(horizontalPatient)
+        vlayout.addView(horizontalPatient)
 
 
         horizontalDoctor = LinearLayout(self._activity)
@@ -227,7 +236,7 @@ class MainApp:
         horizontalDoctor.addView(doctor_text)
         horizontalDoctor.addView(self.doctor_spinner)
 
-        self.vlayout.addView(horizontalDoctor)
+        vlayout.addView(horizontalDoctor)
 
 
         horizontalState = LinearLayout(self._activity)
@@ -245,7 +254,7 @@ class MainApp:
         horizontalState.addView(state_text)
         horizontalState.addView(self.state_spinner)
 
-        self.vlayout.addView(horizontalState)
+        vlayout.addView(horizontalState)
 
 
         horizontalDate = LinearLayout(self._activity)
@@ -268,7 +277,7 @@ class MainApp:
         self.appointmentDateY.setMaxValue(2099)
         horizontalDate.addView(self.appointmentDateY)
 
-        self.vlayout.addView(horizontalDate)
+        vlayout.addView(horizontalDate)
 
 
         horizontalTime = LinearLayout(self._activity)
@@ -287,29 +296,33 @@ class MainApp:
         self.appointmentTimeM.setMaxValue(60)
         horizontalTime.addView(self.appointmentTimeM)
 
-        self.vlayout.addView(horizontalTime)
+        vlayout.addView(horizontalTime)
 
 
         create_button = Button(self._activity)
         create_button.setOnClickListener(ButtonClick(self.create_appointment))
         create_button.setText('Create appointment')
-        self.vlayout.addView(create_button)
+        vlayout.addView(create_button)
         self.add_error_text()
         
         self.add_return_button('main')
 
     def create_patient_view(self):
         self.vlayout.removeAllViews()
+        self.vlayout.addView(self.flayout)
+        vlayout = LinearLayout(self._activity)
+        vlayout.setOrientation(LinearLayout.VERTICAL)
+        self.flayout.addView(vlayout)
 
         self.patient_name = EditText(self._activity)
         self.patient_name.setHint('Patient name')
         self.patient_name.setInputType(0x00000001)
-        self.vlayout.addView(self.patient_name)
+        vlayout.addView(self.patient_name)
 
         self.patient_rg = EditText(self._activity)
         self.patient_rg.setHint('Patient RG')
         self.patient_rg.setInputType(0x00000002)
-        self.vlayout.addView(self.patient_rg)
+        vlayout.addView(self.patient_rg)
 
         horizontal = LinearLayout(self._activity)
         horizontal.setOrientation(LinearLayout.HORIZONTAL)
@@ -332,27 +345,27 @@ class MainApp:
         self.birthdateY.setMaxValue(2100)
         horizontal.addView(self.birthdateY)
 
-        self.vlayout.addView(horizontal)
+        vlayout.addView(horizontal)
 
         self.patient_number1 = EditText(self._activity)
         self.patient_number1.setHint('Patient number 1')
         self.patient_number1.setInputType(0x00000002)
-        self.vlayout.addView(self.patient_number1)
+        vlayout.addView(self.patient_number1)
 
         self.patient_number2 = EditText(self._activity)
         self.patient_number2.setHint('Patient number 2')
         self.patient_number2.setInputType(0x00000002)
-        self.vlayout.addView(self.patient_number2)
+        vlayout.addView(self.patient_number2)
 
         self.patient_email = EditText(self._activity)
         self.patient_email.setHint('Patient email')
         self.patient_email.setInputType(0x00000020)
-        self.vlayout.addView(self.patient_email)
+        vlayout.addView(self.patient_email)
 
         create_button = Button(self._activity)
         create_button.setOnClickListener(ButtonClick(self.create_patient))
         create_button.setText('Create patient')
-        self.vlayout.addView(create_button)
+        vlayout.addView(create_button)
         self.add_error_text()
         
         self.add_return_button('main')
@@ -544,20 +557,23 @@ class MainApp:
         elif event == 'details_appointment':
             self.return_view('details_appointment', value=value)
 
-    def add_error_text(self):
+    def add_error_text(self, flayout=False):
         self.error_text = TextView(self._activity)
-        self.vlayout.addView(self.error_text)
+        if flayout:
+            self.flayout.addView(self.error_text)
+        else:
+            self.vlayout.addView(self.error_text)
 
-    def add_return_button(self, view, bottom=True):
+    def add_return_button(self, view, flayout=False):
         self.return_button = Button(self._activity)
         self.return_button.setOnClickListener(ButtonClick(self.return_view, view))
         self.return_button.setText('Return')
         self.relative_rb = RelativeLayout(self._activity)
-        if bottom:
-            self.relative_rb.addView(self.return_button, _create_layout_params('bottom'))
+        self.relative_rb.addView(self.return_button, _create_layout_params('bottom'))
+        if flayout:
+            self.flayout.addView(self.relative_rb)
         else:
-            self.relative_rb.addView(self.return_button)
-        self.vlayout.addView(self.relative_rb)
+            self.vlayout.addView(self.relative_rb)
 
     def return_view(self, view, value=None):
         if view == 'main':
