@@ -52,7 +52,7 @@ class DoctorsListAdapter(extends=android.widget.BaseAdapter):
         return self.doctors.get(position)
 
     def getItemId(self, position: int) -> long:
-        return self.doctors.get(position).get('id')
+        return position
 
     def getView(self, position: int,
                 view: android.view.View,
@@ -100,7 +100,7 @@ class PatientsListAdapter(extends=android.widget.BaseAdapter):
         return self.patients.get(position)
 
     def getItemId(self, position: int) -> long:
-        return self.patients.get(position).get('id')
+        return position
 
     def getView(self, position: int,
                 view: android.view.View,
@@ -148,7 +148,7 @@ class AppointmentsListAdapter(extends=android.widget.BaseAdapter):
         return self.appointments.get(position)
 
     def getItemId(self, position: int) -> long:
-        return self.appointments.get(position).get('id')
+        return position
 
     def getView(self, position: int,
                 view: android.view.View,
