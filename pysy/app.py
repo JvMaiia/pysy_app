@@ -24,6 +24,7 @@ class MainApp:
         self.patientsItems = None
         self.appointmentsItems = None
         self.statesItems = None
+        self.actual_view = None
 
     def onCreate(self):
         self.vlayout = LinearLayout(self._activity)
@@ -37,6 +38,7 @@ class MainApp:
             self.login_view()
 
     def login_view(self):
+        self.actual_view = 'login'
         self.vlayout.removeAllViews()
 
         self.username_text = EditText(self._activity)
@@ -56,6 +58,7 @@ class MainApp:
         self.add_error_text()
 
     def main_view(self):
+        self.actual_view = 'main'
         self.flayout.removeAllViews()
         self.vlayout.removeAllViews()
 
@@ -102,6 +105,7 @@ class MainApp:
         self.vlayout.addView(view_patients)
 
     def view_appointments(self):
+        self.actual_view = 'appointments'
         self.vlayout.removeAllViews()
         self.vlayout.addView(self.flayout)
         
@@ -117,6 +121,7 @@ class MainApp:
         self.add_return_button(view='main', flayout=True)
 
     def view_doctors(self):
+        self.actual_view = 'doctors'
         self.vlayout.removeAllViews()
         self.vlayout.addView(self.flayout)
         
@@ -128,6 +133,7 @@ class MainApp:
         self.add_return_button(view='main', flayout=True)
 
     def view_patients(self):
+        self.actual_view = 'patients'
         self.vlayout.removeAllViews()
         self.vlayout.addView(self.flayout)
         
@@ -143,6 +149,7 @@ class MainApp:
         self.add_return_button(view='main', flayout=True)
 
     def details_patient(self, patient):
+        self.actual_view = 'details_patient'
         self.vlayout.removeAllViews()
 
         name_text = TextView(self._activity)
@@ -168,6 +175,7 @@ class MainApp:
         self.add_return_button(view='view_patients')
 
     def details_appointment(self, appointment):
+        self.actual_view = 'details_appointment'
         self.vlayout.removeAllViews()
 
         patient_text = TextView(self._activity)
@@ -196,6 +204,7 @@ class MainApp:
     def create_appointment_view(self):
         if self.statesItems == None or self.doctorsItems == None or self.patientsItems == None:
             return
+        self.actual_view = 'create_appointment'
 
         self.vlayout.removeAllViews()
         self.vlayout.addView(self.flayout)
@@ -308,6 +317,7 @@ class MainApp:
         self.add_return_button('main')
 
     def create_patient_view(self):
+        self.actual_view = 'create_patient'
         self.vlayout.removeAllViews()
         self.vlayout.addView(self.flayout)
         vlayout = LinearLayout(self._activity)
@@ -371,6 +381,7 @@ class MainApp:
         self.add_return_button('main')
 
     def create_doctor_view(self):
+        self.actual_view = 'create_doctor'
         self.vlayout.removeAllViews()
 
         self.doctor_name = EditText(self._activity)
