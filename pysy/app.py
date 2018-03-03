@@ -107,6 +107,7 @@ class MainApp:
     def view_appointments(self):
         self.actual_view = 'appointments'
         self.vlayout.removeAllViews()
+        self.flayout.removeAllViews()
         self.vlayout.addView(self.flayout)
         
         self.appointmentsAdapter = AppointmentsListAdapter(
@@ -123,6 +124,7 @@ class MainApp:
     def view_doctors(self):
         self.actual_view = 'doctors'
         self.vlayout.removeAllViews()
+        self.flayout.removeAllViews()
         self.vlayout.addView(self.flayout)
         
         self.doctorsAdapter = DoctorsListAdapter(self._activity, self.doctorsItems)
@@ -135,6 +137,7 @@ class MainApp:
     def view_patients(self):
         self.actual_view = 'patients'
         self.vlayout.removeAllViews()
+        self.flayout.removeAllViews()
         self.vlayout.addView(self.flayout)
         
         self.patientsAdapter = PatientsListAdapter(
