@@ -8,7 +8,9 @@ from .server import host, port
 
 base_url = 'https://' + str(host) + '/api'
 
+
 class OnResponse(implements=com.android.volley.Response[Listener]):
+
     def __init__(self, callback, *args, **kwargs):
         self.callback = callback
         self.args = args
@@ -17,7 +19,9 @@ class OnResponse(implements=com.android.volley.Response[Listener]):
     def onResponse(self, response: java.lang.Object) -> void:
         self.callback(*self.args, **self.kwargs, res=response)
 
+
 class OnError(implements=com.android.volley.Response[ErrorListener]):
+
     def __init__(self, callback, *args, **kwargs):
         self.callback = callback
         self.args = args
@@ -26,7 +30,9 @@ class OnError(implements=com.android.volley.Response[ErrorListener]):
     def onErrorResponse(self, error: com.android.volley.VolleyError) -> void:
         self.callback(*self.args, **self.kwargs, err=error)
 
+
 class api():
+
     def __init__(self, activity):
         self.queue = Volley.newRequestQueue(activity)
         self.token = None
