@@ -5,7 +5,7 @@ from android.widget import (
     Button, EditText, LinearLayout, RelativeLayout,
     ListView, TextView, Spinner, NumberPicker,
     ArrayAdapter, FrameLayout
-    )
+)
 from android.view import Gravity
 from org.json import JSONArray, JSONObject
 from .services import api
@@ -14,9 +14,11 @@ from .lists import (
     DoctorsListAdapter,
     PatientsListAdapter,
     AppointmentsListAdapter
-    )
+)
+
 
 class MainApp:
+
     def __init__(self):
         self._activity = android.PythonActivity.setListener(self)
         self.api = api(self._activity)
@@ -64,12 +66,14 @@ class MainApp:
 
         create_appointments = Button(self._activity)
         create_appointments.setText('Create appointments')
-        create_appointments.setOnClickListener(ButtonClick(self.create_appointment_view))
+        create_appointments.setOnClickListener(
+            ButtonClick(self.create_appointment_view))
         self.vlayout.addView(create_appointments)
 
         create_patient = Button(self._activity)
         create_patient.setText('Create patients')
-        create_patient.setOnClickListener(ButtonClick(self.create_patient_view))
+        create_patient.setOnClickListener(
+            ButtonClick(self.create_patient_view))
         self.vlayout.addView(create_patient)
 
         create_doctor = Button(self._activity)
@@ -81,27 +85,27 @@ class MainApp:
         view_appointments.setText('View appointments')
         view_appointments.setOnClickListener(ButtonClick(
             self.api.getAppointments,
-            listener = self.successGetAppointments,
-            listenerError = self.errorGet
-            ))
+            listener=self.successGetAppointments,
+            listenerError=self.errorGet
+        ))
         self.vlayout.addView(view_appointments)
 
         view_doctors = Button(self._activity)
         view_doctors.setText('View doctors')
         view_doctors.setOnClickListener(ButtonClick(
             self.api.getDoctors,
-            listener = self.successGetDoctors,
-            listenerError = self.errorGet
-            ))
+            listener=self.successGetDoctors,
+            listenerError=self.errorGet
+        ))
         self.vlayout.addView(view_doctors)
 
         view_patients = Button(self._activity)
         view_patients.setText('View patients')
         view_patients.setOnClickListener(ButtonClick(
             self.api.getPatients,
-            listener = self.successGetPatients,
-            listenerError = self.errorGet
-            ))
+            listener=self.successGetPatients,
+            listenerError=self.errorGet
+        ))
         self.vlayout.addView(view_patients)
 
     def view_appointments(self):
@@ -109,12 +113,12 @@ class MainApp:
         self.vlayout.removeAllViews()
         self.flayout.removeAllViews()
         self.vlayout.addView(self.flayout)
-        
+
         self.appointmentsAdapter = AppointmentsListAdapter(
             self._activity,
             self.appointmentsItems,
-            listener = self._dispatch_event
-            )
+            listener=self._dispatch_event
+        )
         self.appointmentsList = ListView(self._activity)
         self.appointmentsList.setAdapter(self.appointmentsAdapter)
 
@@ -126,8 +130,9 @@ class MainApp:
         self.vlayout.removeAllViews()
         self.flayout.removeAllViews()
         self.vlayout.addView(self.flayout)
-        
-        self.doctorsAdapter = DoctorsListAdapter(self._activity, self.doctorsItems)
+
+        self.doctorsAdapter = DoctorsListAdapter(
+            self._activity, self.doctorsItems)
         self.doctorsList = ListView(self._activity)
         self.doctorsList.setAdapter(self.doctorsAdapter)
 
@@ -139,12 +144,12 @@ class MainApp:
         self.vlayout.removeAllViews()
         self.flayout.removeAllViews()
         self.vlayout.addView(self.flayout)
-        
+
         self.patientsAdapter = PatientsListAdapter(
             self._activity,
             self.patientsItems,
-            listener = self._dispatch_event
-            )
+            listener=self._dispatch_event
+        )
         self.patientsList = ListView(self._activity)
         self.patientsList.setAdapter(self.patientsAdapter)
 
@@ -166,12 +171,14 @@ class MainApp:
         self.vlayout.addView(email_text)
 
         birthdate_text = TextView(self._activity)
-        birthdate_text.setText('\nBirth date: %s' % (patient.get('birth_date')))
+        birthdate_text.setText('\nBirth date: %s' %
+                               (patient.get('birth_date')))
         birthdate_text.setTextSize(22)
         self.vlayout.addView(birthdate_text)
 
         number_text = TextView(self._activity)
-        number_text.setText('\nNumber: %s' % (patient.get('number_for_contact1')))
+        number_text.setText('\nNumber: %s' %
+                            (patient.get('number_for_contact1')))
         number_text.setTextSize(22)
         self.vlayout.addView(number_text)
 
@@ -232,7 +239,6 @@ class MainApp:
 
         vlayout.addView(horizontalPatient)
 
-
         horizontalDoctor = LinearLayout(self._activity)
         horizontalDoctor.setOrientation(LinearLayout.HORIZONTAL)
         doctor_text = TextView(self._activity)
@@ -250,7 +256,6 @@ class MainApp:
 
         vlayout.addView(horizontalDoctor)
 
-
         horizontalState = LinearLayout(self._activity)
         horizontalState.setOrientation(LinearLayout.HORIZONTAL)
         state_text = TextView(self._activity)
@@ -267,7 +272,6 @@ class MainApp:
         horizontalState.addView(self.state_spinner)
 
         vlayout.addView(horizontalState)
-
 
         horizontalDate = LinearLayout(self._activity)
         horizontalDate.setOrientation(LinearLayout.HORIZONTAL)
@@ -291,7 +295,6 @@ class MainApp:
 
         vlayout.addView(horizontalDate)
 
-
         horizontalTime = LinearLayout(self._activity)
         horizontalTime.setOrientation(LinearLayout.HORIZONTAL)
         time_text = TextView(self._activity)
@@ -310,13 +313,12 @@ class MainApp:
 
         vlayout.addView(horizontalTime)
 
-
         create_button = Button(self._activity)
         create_button.setOnClickListener(ButtonClick(self.create_appointment))
         create_button.setText('Create appointment')
         vlayout.addView(create_button)
         self.add_error_text()
-        
+
         self.add_return_button('main')
 
     def create_patient_view(self):
@@ -380,7 +382,7 @@ class MainApp:
         create_button.setText('Create patient')
         vlayout.addView(create_button)
         self.add_error_text()
-        
+
         self.add_return_button('main')
 
     def create_doctor_view(self):
@@ -402,13 +404,14 @@ class MainApp:
         create_button.setText('Create doctor')
         self.vlayout.addView(create_button)
         self.add_error_text()
-        
+
         self.add_return_button('main')
 
     def login(self):
         username = self.username_text.getText()
         password = self.password_text.getText()
-        self.api.login(username, password, self.success_login, self.error_login)
+        self.api.login(username, password,
+                       self.success_login, self.error_login)
         self.error_text.setText('loading...')
 
     def success_login(self, res):
@@ -438,7 +441,7 @@ class MainApp:
         self.doctorsItems = JSONArray(res)
 
     def definePatients(self, res):
-        self.patientsItems = JSONArray(res)    
+        self.patientsItems = JSONArray(res)
 
     def successGetDoctors(self, res):
         self.doctorsItems = JSONArray(res)
@@ -464,7 +467,8 @@ class MainApp:
             for doctorN in range(self.doctorsItems.length()):
                 doctor = self.doctorsItems.get(doctorN)
                 if doctor.get('id') == doctor_id:
-                    self.appointmentsItems.get(appointmentN).put('doctor', doctor.get('complete_name'))
+                    self.appointmentsItems.get(appointmentN).put(
+                        'doctor', doctor.get('complete_name'))
                     break
 
             self.view_appointments(self)
@@ -474,8 +478,8 @@ class MainApp:
 
         if self.doctorsItems == None:
             self.api.getDoctors(
-                listener = self.setDoctors,
-                listenerError = self.errorGet
+                listener=self.setDoctors,
+                listenerError=self.errorGet
             )
         else:
             self.setDoctors()
@@ -516,15 +520,16 @@ class MainApp:
         patient.put('complete_name', self.patient_name.getText())
         patient.put('rg', self.patient_rg.getText())
 
-        birthdate = str(self.birthdateY.getValue()) + '-' + str(self.birthdateM.getValue()) + '-' + str(self.birthdateD.getValue())
+        birthdate = str(self.birthdateY.getValue(
+        )) + '-' + str(self.birthdateM.getValue()) + '-' + str(self.birthdateD.getValue())
         patient.put('birth_date', birthdate)
         patient.put('number_for_contact1', str(self.patient_number1.getText()))
         patient.put('number_for_contact2', str(self.patient_number2.getText()))
         patient.put('email', str(self.patient_email.getText()))
         self.api.createPatient(
-            patient = patient,
-            listener = self.successCreatePatient,
-            listenerError = self.errorCreate
+            patient=patient,
+            listener=self.successCreatePatient,
+            listenerError=self.errorCreate
         )
         self.error_text.setText('processing...')
 
@@ -533,19 +538,22 @@ class MainApp:
 
         appointment.put('patient', str(self.patient_spinner.getSelectedItem()))
 
-        doctor = str(self.getDoctorByName(self.doctor_spinner.getSelectedItem()).get('id'))
+        doctor = str(self.getDoctorByName(
+            self.doctor_spinner.getSelectedItem()).get('id'))
         appointment.put('doctor', doctor)
 
         appointment.put('state', str(self.state_spinner.getSelectedItem()))
 
-        datetime = str(self.appointmentDateY.getValue()) + '-' + str(self.appointmentDateM.getValue()) + '-' + str(self.appointmentDateD.getValue())
-        datetime += 'T' + str(self.appointmentTimeH.getValue()) + ':' + str(self.appointmentTimeM.getValue()) + ':00'
+        datetime = str(self.appointmentDateY.getValue()) + '-' + str(
+            self.appointmentDateM.getValue()) + '-' + str(self.appointmentDateD.getValue())
+        datetime += 'T' + str(self.appointmentTimeH.getValue()) + \
+            ':' + str(self.appointmentTimeM.getValue()) + ':00'
         appointment.put('date', datetime)
 
         self.api.createAppointment(
-            appointment = appointment,
-            listener = self.successCreateAppointment,
-            listenerError = self.errorCreate
+            appointment=appointment,
+            listener=self.successCreateAppointment,
+            listenerError=self.errorCreate
         )
         self.error_text.setText('processing...')
 
@@ -553,12 +561,13 @@ class MainApp:
         doctor = JSONObject()
 
         doctor.put('complete_name', str(self.doctor_name.getText()))
-        doctor.put('especialization', str(self.doctor_especialization.getText()))
+        doctor.put('especialization', str(
+            self.doctor_especialization.getText()))
 
         self.api.createDoctor(
-            doctor = doctor,
-            listener = self.successCreateDoctor,
-            listenerError = self.errorCreate
+            doctor=doctor,
+            listener=self.successCreateDoctor,
+            listenerError=self.errorCreate
         )
 
     def error_login(self, err):
@@ -580,10 +589,12 @@ class MainApp:
 
     def add_return_button(self, view, flayout=False):
         self.return_button = Button(self._activity)
-        self.return_button.setOnClickListener(ButtonClick(self.return_view, view))
+        self.return_button.setOnClickListener(
+            ButtonClick(self.return_view, view))
         self.return_button.setText('Return')
         self.relative_rb = RelativeLayout(self._activity)
-        self.relative_rb.addView(self.return_button, _create_layout_params('bottom'))
+        self.relative_rb.addView(
+            self.return_button, _create_layout_params('bottom'))
         if flayout:
             self.flayout.addView(self.relative_rb)
         else:
@@ -600,6 +611,7 @@ class MainApp:
             self.details_patient(patient=value)
         elif view == 'details_appointment':
             self.details_appointment(appointment=value)
+
 
 def main():
     MainApp()
