@@ -1,3 +1,4 @@
+import android
 from com.android.volley import Request
 from com.android.volley import Response
 from com.android.volley import toolbox
@@ -61,8 +62,7 @@ class api():
             self.url_login,
             credentials,
             OnResponse(listener),
-            OnError(listenerError),
-            HashMap()
+            OnError(listenerError)
         )
 
         self.queue.add(loginRequest)
@@ -72,7 +72,7 @@ class api():
         self.headers = {'Authorization': self.token}
 
     def getDoctors(self, listener=None, listenerError=None):
-        doctorsRequest = toolbox.StringRequest(
+        doctorsRequest = android.PythonVolleyStringRequest(
             Request.Method.GET,
             self.url_doctors,
             OnResponse(listener),
@@ -82,7 +82,7 @@ class api():
         self.queue.add(doctorsRequest)
 
     def getPatients(self, listener=None, listenerError=None):
-        patientsRequest = toolbox.StringRequest(
+        patientsRequest = android.PythonVolleyStringRequest(
             Request.Method.GET,
             self.url_patients,
             OnResponse(listener),
@@ -92,7 +92,7 @@ class api():
         self.queue.add(patientsRequest)
 
     def getAppointments(self, listener=None, listenerError=None):
-        appointmentsRequest = toolbox.StringRequest(
+        appointmentsRequest = android.PythonVolleyStringRequest(
             Request.Method.GET,
             self.url_appointments,
             OnResponse(listener),
@@ -102,7 +102,7 @@ class api():
         self.queue.add(appointmentsRequest)
 
     def getStates(self, listener=None, listenerError=None):
-        statesRequest = toolbox.StringRequest(
+        statesRequest = android.PythonVolleyStringRequest(
             Request.Method.GET,
             self.url_states,
             OnResponse(listener),
@@ -115,7 +115,7 @@ class api():
         headers = self.headers
         headers['Content-Type'] = 'application/json'
 
-        patientCreateRequest = toolbox.JsonObjectRequest(
+        patientCreateRequest = android.PythonVolleyJsonRequest(
             Request.Method.POST,
             self.url_patients,
             patient,
@@ -131,7 +131,7 @@ class api():
         headers['Content-Type'] = 'application/json'
         print(appointment)
 
-        AppointmentCreateRequest = toolbox.JsonObjectRequest(
+        AppointmentCreateRequest = android.PythonVolleyJsonRequest(
             Request.Method.POST,
             self.url_appointments,
             appointment,
@@ -146,7 +146,7 @@ class api():
         headers = self.headers
         headers['Content-Type'] = 'application/json'
 
-        doctorCreateRequest = toolbox.JsonObjectRequest(
+        doctorCreateRequest = android.PythonVolleyJsonRequest(
             Request.Method.POST,
             self.url_doctors,
             doctor,
