@@ -232,6 +232,7 @@ class MainApp:
         patients = []
         for i in range(self.patientsItems.length()):
             patients.append(self.patientsItems.get(i).get('complete_name'))
+
         patientsAdapter = ArrayAdapter(self._activity, 0x01090008, patients)
         patientsAdapter.setDropDownViewResource(0x01090009)
         self.patient_spinner.setAdapter(patientsAdapter)
@@ -433,6 +434,10 @@ class MainApp:
             listener=self.defineStates,
             listenerError=self.errorGet
         )
+        self.api.getAppointments(
+            listener=self.defineAppointments,
+            listenerError=self.errorGet
+        )
 
     def defineStates(self, res):
         self.statesItems = JSONArray(res)
@@ -443,13 +448,20 @@ class MainApp:
     def definePatients(self, res):
         self.patientsItems = JSONArray(res)
 
+    def defineAppointments(self, res):
+        self.appointmentsItems = JSONArray(res)
+
     def successGetDoctors(self, res):
         self.doctorsItems = JSONArray(res)
-        self.view_doctors(self)
+        self.view_doctors()
 
     def successGetPatients(self, res):
         self.patientsItems = JSONArray(res)
-        self.view_patients(self)
+        self.view_patients()
+
+    def successGetAppointments(self, res):
+        self.appointmentsItems = JSONArray(res)
+        self.view_appointments()
 
     def getDoctorByName(self, name):
         for d in range(self.doctorsItems.length()):
@@ -457,32 +469,11 @@ class MainApp:
             if doctor.get('complete_name') == name:
                 return doctor
 
-    def setDoctors(self, res=False):
-        if res:
-            self.doctorsItems = JSONArray(res)
-
-        for appointmentN in range(self.appointmentsItems.length()):
-            appointment = self.appointmentsItems.get(appointmentN)
-            doctor_id = appointment.get('doctor')
-            for doctorN in range(self.doctorsItems.length()):
-                doctor = self.doctorsItems.get(doctorN)
-                if doctor.get('id') == doctor_id:
-                    self.appointmentsItems.get(appointmentN).put(
-                        'doctor', doctor.get('complete_name'))
-                    break
-
-            self.view_appointments(self)
-
-    def successGetAppointments(self, res):
-        self.appointmentsItems = JSONArray(res)
-
-        if self.doctorsItems == None:
-            self.api.getDoctors(
-                listener=self.setDoctors,
-                listenerError=self.errorGet
-            )
-        else:
-            self.setDoctors()
+    def getPatientByName(self, name):
+        for d in range(self.patientsItems.length()):
+            patient = self.patientsItems.get(d)
+            if patient.get('complete_name') == name:
+                return patient
 
     def successCreatePatient(self, res):
         print('Patient created')
@@ -498,14 +489,6 @@ class MainApp:
         print('Doctor created')
         self.error_text.setText('Doctor created')
         self.main_view()
-
-    def findDoctor(self, res):
-        doctors = JSONArray(res)
-        for i in range(doctors.length()):
-            doctor = doctors.get(i)
-            if doctor.get('id') == self.doctor_id:
-                self.appointment_doctor = doctor
-                break
 
     def errorGet(self, err):
         print(err)
@@ -536,11 +519,13 @@ class MainApp:
     def create_appointment(self):
         appointment = JSONObject()
 
-        appointment.put('patient', str(self.patient_spinner.getSelectedItem()))
+        patientId = str(self.getPatientByName(
+            self.patient_spinner.getSelectedItem()).get('id'))
+        appointment.put('patient', patientId)
 
-        doctor = str(self.getDoctorByName(
+        doctorId = str(self.getDoctorByName(
             self.doctor_spinner.getSelectedItem()).get('id'))
-        appointment.put('doctor', doctor)
+        appointment.put('doctor', doctorId)
 
         appointment.put('state', str(self.state_spinner.getSelectedItem()))
 
