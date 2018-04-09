@@ -15,6 +15,7 @@ from .lists import (
     PatientsListAdapter,
     AppointmentsListAdapter
 )
+from .PythonJavaJSON import dictToJsonObject, loads
 
 
 class MainApp:
@@ -161,24 +162,24 @@ class MainApp:
         self.vlayout.removeAllViews()
 
         name_text = TextView(self._activity)
-        name_text.setText('Patient: %s' % (patient.get('complete_name')))
+        name_text.setText('Patient: %s' % (patient['complete_name']))
         name_text.setTextSize(22)
         self.vlayout.addView(name_text)
 
         email_text = TextView(self._activity)
-        email_text.setText('\nEmail: %s' % (patient.get('email')))
+        email_text.setText('\nEmail: %s' % (patient['email']))
         email_text.setTextSize(22)
         self.vlayout.addView(email_text)
 
         birthdate_text = TextView(self._activity)
         birthdate_text.setText('\nBirth date: %s' %
-                               (patient.get('birth_date')))
+                               (patient['birth_date']))
         birthdate_text.setTextSize(22)
         self.vlayout.addView(birthdate_text)
 
         number_text = TextView(self._activity)
         number_text.setText('\nNumber: %s' %
-                            (patient.get('number_for_contact1')))
+                            (patient['number_for_contact1']))
         number_text.setTextSize(22)
         self.vlayout.addView(number_text)
 
@@ -189,23 +190,23 @@ class MainApp:
         self.vlayout.removeAllViews()
 
         patient_text = TextView(self._activity)
-        patient_text.setText('Patient: %s' % (appointment.get('patient')))
+        patient_text.setText('Patient: %s' % (appointment['patient']))
         patient_text.setTextSize(22)
         self.vlayout.addView(patient_text)
 
         doctor_text = TextView(self._activity)
-        doctor_text.setText('\nDoctor: %s' % (appointment.get('doctor')))
+        doctor_text.setText('\nDoctor: %s' % (appointment['doctor']))
         doctor_text.setTextSize(22)
         self.vlayout.addView(doctor_text)
 
         date_text = TextView(self._activity)
-        date = appointment.get('date').replace('T', ' ').replace('Z', ' ')
+        date = appointment['date'].replace('T', ' ').replace('Z', ' ')
         date_text.setText('\nDate: %s' % (date))
         date_text.setTextSize(22)
         self.vlayout.addView(date_text)
 
         state_text = TextView(self._activity)
-        state_text.setText('\nState: %s' % (appointment.get('state')))
+        state_text.setText('\nState: %s' % (appointment['state']))
         state_text.setTextSize(22)
         self.vlayout.addView(state_text)
 
@@ -231,7 +232,7 @@ class MainApp:
         self.patient_spinner = Spinner(self._activity)
         patients = []
         for i in range(self.patientsItems.length()):
-            patients.append(self.patientsItems.get(i).get('complete_name'))
+            patients.append(self.patientsItems[i]['complete_name'])
 
         patientsAdapter = ArrayAdapter(self._activity, 0x01090008, patients)
         patientsAdapter.setDropDownViewResource(0x01090009)
@@ -248,7 +249,7 @@ class MainApp:
         self.doctor_spinner = Spinner(self._activity)
         doctors = []
         for i in range(self.doctorsItems.length()):
-            doctors.append(self.doctorsItems.get(i).get('complete_name'))
+            doctors.append(self.doctorsItems[i]['complete_name'])
         doctorsAdapter = ArrayAdapter(self._activity, 0x01090008, doctors)
         doctorsAdapter.setDropDownViewResource(0x01090009)
         self.doctor_spinner.setAdapter(doctorsAdapter)
@@ -265,7 +266,7 @@ class MainApp:
         self.state_spinner = Spinner(self._activity)
         states = []
         for i in range(self.statesItems.length()):
-            states.append(self.statesItems.get(i).get('name'))
+            states.append(self.statesItems[i]['name'])
         statesAdapter = ArrayAdapter(self._activity, 0x01090008, states)
         statesAdapter.setDropDownViewResource(0x01090009)
         self.state_spinner.setAdapter(statesAdapter)
@@ -440,39 +441,37 @@ class MainApp:
         )
 
     def defineStates(self, res):
-        self.statesItems = JSONArray(res)
+        self.statesItems = loads(res)
 
     def defineDoctors(self, res):
-        self.doctorsItems = JSONArray(res)
+        self.doctorsItems = loads(res)
 
     def definePatients(self, res):
-        self.patientsItems = JSONArray(res)
+        self.patientsItems = loads(res)
 
     def defineAppointments(self, res):
-        self.appointmentsItems = JSONArray(res)
+        self.appointmentsItems = loads(res)
 
     def successGetDoctors(self, res):
-        self.doctorsItems = JSONArray(res)
+        self.doctorsItems = loads(res)
         self.view_doctors()
 
     def successGetPatients(self, res):
-        self.patientsItems = JSONArray(res)
+        self.patientsItems = loads(res)
         self.view_patients()
 
     def successGetAppointments(self, res):
-        self.appointmentsItems = JSONArray(res)
+        self.appointmentsItems = loads(res)
         self.view_appointments()
 
     def getDoctorByName(self, name):
-        for d in range(self.doctorsItems.length()):
-            doctor = self.doctorsItems.get(d)
-            if doctor.get('complete_name') == name:
+        for doctor in self.doctorsItems:
+            if doctor['complete_name'] == name:
                 return doctor
 
     def getPatientByName(self, name):
-        for d in range(self.patientsItems.length()):
-            patient = self.patientsItems.get(d)
-            if patient.get('complete_name') == name:
+        for patient in self.patientsItems:
+            if patient['complete_name'] == name:
                 return patient
 
     def successCreatePatient(self, res):
@@ -498,59 +497,58 @@ class MainApp:
         self.error_text.setText('something was wrong')
 
     def create_patient(self):
-        patient = JSONObject()
+        patient = {}
 
-        patient.put('complete_name', self.patient_name.getText())
-        patient.put('rg', self.patient_rg.getText())
+        patient['complete_name'] = self.patient_name.getText()
+        patient['rg'] = self.patient_rg.getText()
 
         birthdate = str(self.birthdateY.getValue(
         )) + '-' + str(self.birthdateM.getValue()) + '-' + str(self.birthdateD.getValue())
-        patient.put('birth_date', birthdate)
-        patient.put('number_for_contact1', str(self.patient_number1.getText()))
-        patient.put('number_for_contact2', str(self.patient_number2.getText()))
-        patient.put('email', str(self.patient_email.getText()))
+        patient['birth_date'] = birthdate
+        patient['number_for_contact1'] = str(self.patient_number1.getText())
+        patient['number_for_contact2'] = str(self.patient_number2.getText())
+        patient['email'] = str(self.patient_email.getText())
         self.api.createPatient(
-            patient=patient,
+            patient=dictToJsonObject(patient),
             listener=self.successCreatePatient,
             listenerError=self.errorCreate
         )
         self.error_text.setText('processing...')
 
     def create_appointment(self):
-        appointment = JSONObject()
+        appointment = {}
 
         patientId = str(self.getPatientByName(
             self.patient_spinner.getSelectedItem()).get('id'))
-        appointment.put('patient', patientId)
+        appointment['patient'] = patientId
 
         doctorId = str(self.getDoctorByName(
             self.doctor_spinner.getSelectedItem()).get('id'))
-        appointment.put('doctor', doctorId)
+        appointment['doctor'] = doctorId
 
-        appointment.put('state', str(self.state_spinner.getSelectedItem()))
+        appointment['state'] = str(self.state_spinner.getSelectedItem())
 
         datetime = str(self.appointmentDateY.getValue()) + '-' + str(
             self.appointmentDateM.getValue()) + '-' + str(self.appointmentDateD.getValue())
         datetime += 'T' + str(self.appointmentTimeH.getValue()) + \
             ':' + str(self.appointmentTimeM.getValue()) + ':00'
-        appointment.put('date', datetime)
+        appointment['date'] = datetime
 
         self.api.createAppointment(
-            appointment=appointment,
+            appointment=dictToJsonObject(appointment),
             listener=self.successCreateAppointment,
             listenerError=self.errorCreate
         )
         self.error_text.setText('processing...')
 
     def create_doctor(self):
-        doctor = JSONObject()
+        doctor = {}
 
-        doctor.put('complete_name', str(self.doctor_name.getText()))
-        doctor.put('especialization', str(
-            self.doctor_especialization.getText()))
+        doctor['complete_name'] = str(self.doctor_name.getText())
+        doctor['especialization'] = str(self.doctor_especialization.getText())
 
         self.api.createDoctor(
-            doctor=doctor,
+            doctor=dictToJsonObject(doctor),
             listener=self.successCreateDoctor,
             listenerError=self.errorCreate
         )
