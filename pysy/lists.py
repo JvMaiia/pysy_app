@@ -133,8 +133,9 @@ class AppointmentItem:
         self.layout = LinearLayout(self.context)
 
         self.text_view = TextView(self.context)
+        first_name = self.appointment['patient'].split()[0]
         self.text_view.setText(
-            self.appointment['patient'] + ' | ' + self.appointment['state'])
+            first_name + ' | ' + self.appointment['state'])
         self.text_view.setTextSize(22)
         self.layout.addView(self.text_view)
 
