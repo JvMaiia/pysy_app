@@ -160,6 +160,7 @@ class MainApp:
     def details_patient(self, patient):
         self.actual_view = 'details_patient'
         self.vlayout.removeAllViews()
+        self.patient = patient
 
         name_text = TextView(self._activity)
         name_text.setText('Patient: %s' % (patient['complete_name']))
@@ -183,6 +184,13 @@ class MainApp:
         number_text.setTextSize(22)
         self.vlayout.addView(number_text)
 
+        number_text = TextView(self._activity)
+        number_text.setText('\nNumber 2: %s' %
+                            (patient['number_for_contact2']))
+        number_text.setTextSize(22)
+        self.vlayout.addView(number_text)
+
+        self.add_modify_button('patient', patient)
         self.add_return_button(view='view_patients')
 
     def details_appointment(self, appointment):
@@ -416,6 +424,55 @@ class MainApp:
                        self.success_login, self.error_login)
         self.error_text.setText('loading...')
 
+    def modify_patient_view(self, patient):
+        self.actual_view = 'modify_patient'
+        self.vlayout.removeAllViews()
+
+        self.patient_name = EditText(self._activity)
+        self.patient_name.setHint('Patient name')
+        self.patient_name.setInputType(0x00000001)
+        self.patient_name.setText(patient['complete_name'])
+        self.vlayout.addView(self.patient_name)
+
+        self.patient_rg = EditText(self._activity)
+        self.patient_rg.setHint('Patient RG')
+        self.patient_rg.setInputType(0x00000002)
+        self.patient_rg.setText(patient['rg'])
+        self.vlayout.addView(self.patient_rg)
+
+        self.birthdate_text = EditText(self._activity)
+        self.birthdate_text.setHint('Patient birth date:')
+        self.birthdate_text.setTextSize(20)
+        self.birthdate_text.setText(patient['birth_date'])
+        self.vlayout.addView(self.birthdate_text)
+
+        self.patient_number1 = EditText(self._activity)
+        self.patient_number1.setHint('Patient number 1')
+        self.patient_number1.setInputType(0x00000002)
+        self.patient_number1.setText(patient['number_for_contact1'])
+        self.vlayout.addView(self.patient_number1)
+
+        self.patient_number2 = EditText(self._activity)
+        self.patient_number2.setHint('Patient number 2')
+        self.patient_number2.setInputType(0x00000002)
+        self.patient_number2.setText(patient['number_for_contact2'])
+        self.vlayout.addView(self.patient_number2)
+
+        self.patient_email = EditText(self._activity)
+        self.patient_email.setHint('Patient email')
+        self.patient_email.setInputType(0x00000020)
+        self.patient_email.setText(patient['email'])
+        self.vlayout.addView(self.patient_email)
+
+        modify_button = Button(self._activity)
+        modify_button.setOnClickListener(
+            ButtonClick(self.modify_patient)
+        )
+        modify_button.setText('Modify patient')
+        self.vlayout.addView(modify_button)
+
+        self.add_return_button('details_patient', model=patient)
+
     def success_login(self, res):
         token = str(res.get('token'))
         self.api.setToken(token)
@@ -553,6 +610,32 @@ class MainApp:
             listenerError=self.errorCreate
         )
 
+    def modify_patient(self):
+        patient = {}
+
+        patient['complete_name'] = self.patient_name.getText()
+        patient['rg'] = self.patient_rg.getText()
+        patient['birth_date'] = self.birthdate_text.getText()
+        patient['number_for_contact1'] = str(self.patient_number1.getText())
+        patient['number_for_contact2'] = str(self.patient_number2.getText())
+        patient['email'] = str(self.patient_email.getText())
+        patient['id'] = self.patient['id']
+
+        self.patient = patient
+        self.api.modifyPatient(
+            patient=dictToJsonObject(patient),
+            listener=self.successModifyPatient,
+            listenerError=self.errorCreate
+        )
+        self.api.getPatients(
+            listener=self.definePatients,
+            listenerError=self.errorGet
+        )
+
+    def successModifyPatient(self, res):
+        print(res)
+        self.details_patient(patient=self.patient)
+
     def error_login(self, err):
         print(err)
         self.error_text.setText('something is wrong')
@@ -570,10 +653,11 @@ class MainApp:
         else:
             self.vlayout.addView(self.error_text)
 
-    def add_return_button(self, view, flayout=False):
+    def add_return_button(self, view, flayout=False, model=None):
         self.return_button = Button(self._activity)
         self.return_button.setOnClickListener(
-            ButtonClick(self.return_view, view))
+            ButtonClick(self.return_view, view, value=model)
+        )
         self.return_button.setText('Return')
         self.relative_rb = RelativeLayout(self._activity)
         self.relative_rb.addView(
@@ -582,6 +666,23 @@ class MainApp:
             self.flayout.addView(self.relative_rb)
         else:
             self.vlayout.addView(self.relative_rb)
+
+    def add_modify_button(self, model_type, model):
+        self.modify_button = Button(self._activity)
+        if model_type == 'patient':
+            self.modify_button.setOnClickListener(
+                ButtonClick(
+                    self.return_view,
+                    'modify_patient',
+                    value=model
+                )
+            )
+        self.modify_button.setText('Modify')
+        self.relative_mb = RelativeLayout(self._activity)
+        self.relative_mb.addView(
+            self.modify_button, _create_layout_params('right')
+        )
+        self.vlayout.addView(self.relative_mb)
 
     def return_view(self, view, value=None):
         if view == 'main':
@@ -594,6 +695,8 @@ class MainApp:
             self.details_patient(patient=value)
         elif view == 'details_appointment':
             self.details_appointment(appointment=value)
+        elif view == 'modify_patient':
+            self.modify_patient_view(patient=value)
 
 
 def main():

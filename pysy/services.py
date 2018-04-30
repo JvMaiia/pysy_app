@@ -7,7 +7,7 @@ from org.json import JSONObject
 from java.util import HashMap
 from .server import host, port
 
-base_url = 'https://' + str(host) + '/api'
+base_url = 'http://' + str(host) + '/api'
 
 
 class OnResponse(implements=com.android.volley.Response[Listener]):
@@ -129,7 +129,6 @@ class api():
     def createAppointment(self, listener=None, listenerError=None, appointment=None):
         headers = self.headers
         headers['Content-Type'] = 'application/json'
-        print(appointment)
 
         AppointmentCreateRequest = android.PythonVolleyJsonRequest(
             Request.Method.POST,
@@ -156,3 +155,19 @@ class api():
         )
 
         self.queue.add(doctorCreateRequest)
+
+    def modifyPatient(self, listener=None, listenerError=None, patient=None):
+        headers = self.headers
+        headers['Content-Type'] = 'application/json'
+        url = base_url + '/patients/changes/' + str(patient.get('id')) + '/'
+
+        patientModifyRequest = android.PythonVolleyJsonRequest(
+            Request.Method.PUT,
+            url,
+            patient,
+            OnResponse(listener),
+            OnError(listenerError),
+            self.asHashMap(headers)
+        )
+
+        self.queue.add(patientModifyRequest)
