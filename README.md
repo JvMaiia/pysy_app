@@ -1,7 +1,7 @@
 Pysy
 ====
 
-An app to work with that api https://github.com/JvMaiia/pysy
+An app to work with that api https://github.com/jvmaia/pysy
 
 ## How to run in development
 
